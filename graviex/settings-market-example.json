@@ -1,0 +1,8 @@
+{
+  "markets": {
+    "coin": "ETH",
+    "exchange": "BTC",
+    "enabled": ["graviex"],
+    "default": "graviex"
+  }
+}
