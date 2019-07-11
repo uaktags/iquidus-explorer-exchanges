@@ -1,8 +1,8 @@
 {
   "markets": {
-    "coin": "LTC",
+    "coin": "ETH",
     "exchange": "BTC",
-    "enabled": ["novaexchange"],
-    "default": "novaexchange"
+    "enabled": ["graviex"],
+    "default": "graviex"
   }
 }
