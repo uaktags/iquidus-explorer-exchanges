@@ -1,0 +1,8 @@
+{
+  "markets": {
+    "coin": "LTC",
+    "exchange": "BTC",
+    "enabled": ["coinexchange"],
+    "default": "coinexchange"
+  }
+}
