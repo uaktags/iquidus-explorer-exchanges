@@ -1,0 +1,8 @@
+{
+  "markets": {
+    "coin": "LTC",
+    "exchange": "BTC",
+    "enabled": ["tradesatoshi"],
+    "default": "tradesatoshi"
+  }
+}
