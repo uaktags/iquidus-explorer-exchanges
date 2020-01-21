@@ -3,6 +3,8 @@
     "coin": "ETH",
     "exchange": "BTC",
     "enabled": ["graviex"],
-    "default": "graviex"
+    "default": "graviex",
+    "graviex_access_key": "EKcjmG7kkaigx3OZh8ubjghVey0lh7FtqIFgDY3U",
+    "graviex_secret_key": "DpngdhJkz64ylPudxM4WdQfFPE2F6q5WKnyN3bxR"
   }
 }

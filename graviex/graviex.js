@@ -1,5 +1,6 @@
 var request = require('request');
-
+var crypto = require('crypto');
+var settings = require('./settings-market-example.json');
 var base_url = 'https://graviex.net/api/v2';
 
 //
@@ -8,6 +9,7 @@ var base_url = 'https://graviex.net/api/v2';
 function get_summary(coin, exchange, cb) {
   var summary = {};
   var url=base_url + '/tickers/' + coin.concat(exchange).toLowerCase() + ".json";
+
   request({uri: url, json: true}, function (error, response, body) {
     if (error) {
       return cb(error, null);
@@ -60,52 +62,55 @@ function get_trades(coin, exchange, cb) {
 
 //Get Orders
 function get_orders(coin, exchange, cb) {
-    var req_url = base_url + '/order_book.json?market=' + coin.concat(exchange).toLowerCase();
-    //console.log("send request to - " + req_url)
+    var tonce = (new Date()).getTime();
+    var payload = 'GET|/api/v2/order_book.json|access_key='+ settings.markets.graviex_access_key +'&market=' + coin.concat(exchange).toLowerCase()+'&tonce=' + tonce;
+    const sig = crypto.createHmac('sha256', settings.markets.graviex_secret_key).update(payload).digest('hex');
+    var req_url = base_url + '/order_book.json?access_key=' + settings.markets.graviex_access_key + '&market=' + coin.concat(exchange).toLowerCase() +  '&signature='+ sig + '&tonce='+tonce;
+    console.log("send request to - " + req_url)
     request({ uri: req_url, json: true }, function (error, response, body) {
-        if(error)
-            return cb(error, null);
-        else if (body.error !== true) {
-            var buyorders = body['bids'];
-            var sellorders = body['asks'];
-            
-            //console.log('Buy orders: ' + buyorders);
-            //console.log('Sell orders: ' + sellorders);
+      if(error)
+          return cb(error, null);
+      else if (body.error !== true) {
+          var buyorders = body['bids'];
+          var sellorders = body['asks'];
+          console.log(body);
+          //console.log('Buy orders: ' + buyorders);
+          //console.log('Sell orders: ' + sellorders);
 
-            var buys = [];
-            var sells = [];
-            if (buyorders.length > 0){
-                for (var i = 0; i < buyorders.length; i++) {
-                    var order = {
-                        amount: parseFloat(buyorders[i].volume).toFixed(8),
-                        price: parseFloat(buyorders[i].price).toFixed(8),
-                        //  total: parseFloat(orders.BuyOrders[i].Total).toFixed(8)
-                        // Necessary because API will return 0.00 for small volume transactions
-                        total: (parseFloat(buyorders[i].volume).toFixed(8) * parseFloat(buyorders[i].price)).toFixed(8)
-                    }
-                    buys.push(order);
-                }
-                //console.log("Buy orders: %j", buys);
-                } else {}
-                if (sellorders.length > 0) {
-                for (var x = 0; x < sellorders.length; x++) {
-                    var order = {
-                        amount: parseFloat(sellorders[x].volume).toFixed(8),
-                        price: parseFloat(sellorders[x].price).toFixed(8),
-                        //    total: parseFloat(orders.SellOrders[x].Total).toFixed(8)
-                        // Necessary because API will return 0.00 for small volume transactions
-                        total: (parseFloat(sellorders[x].volume).toFixed(8) * parseFloat(sellorders[x].price)).toFixed(8)
-                    }
-                    sells.push(order);
-                }
-                //console.log("Sell orders: %j", sells);
-            } else {
-            }
-            return cb(null, buys, sells);
-            } else {
-            return cb(body.Message, [], [])
-        }
-      });
+          var buys = [];
+          var sells = [];
+          if (buyorders.length > 0){
+              for (var i = 0; i < buyorders.length; i++) {
+                  var order = {
+                      amount: parseFloat(buyorders[i].volume).toFixed(8),
+                      price: parseFloat(buyorders[i].price).toFixed(8),
+                      //  total: parseFloat(orders.BuyOrders[i].Total).toFixed(8)
+                      // Necessary because API will return 0.00 for small volume transactions
+                      total: (parseFloat(buyorders[i].volume).toFixed(8) * parseFloat(buyorders[i].price)).toFixed(8)
+                  }
+                  buys.push(order);
+              }
+              //console.log("Buy orders: %j", buys);
+              } else {}
+              if (sellorders.length > 0) {
+              for (var x = 0; x < sellorders.length; x++) {
+                  var order = {
+                      amount: parseFloat(sellorders[x].volume).toFixed(8),
+                      price: parseFloat(sellorders[x].price).toFixed(8),
+                      //    total: parseFloat(orders.SellOrders[x].Total).toFixed(8)
+                      // Necessary because API will return 0.00 for small volume transactions
+                      total: (parseFloat(sellorders[x].volume).toFixed(8) * parseFloat(sellorders[x].price)).toFixed(8)
+                  }
+                  sells.push(order);
+              }
+              //console.log("Sell orders: %j", sells);
+          } else {
+          }
+          return cb(null, buys, sells);
+          } else {
+          return cb(body.Message, [], [])
+      }
+    });
 }
 
 module.exports = {
