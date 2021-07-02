@@ -1,0 +1,8 @@
+{
+  "markets": {
+    "coin": "SCC",
+    "exchange": "BTC",
+    "enabled": ["stakecube"],
+    "default": "stakecube"
+  }
+}
